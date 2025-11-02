@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>反应速度挑战</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #1a1a1a;
+      color: white;
+      text-align: center;
+      font-family: sans-serif;
+    }
+    #status {
+      margin-top: 100px;
+      font-size: 28px;
+    }
+    #box {
+      margin-top: 50px;
+      width: 200px;
+      height: 200px;
+      background: gray;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <h1>反应速度挑战 ⚡</h1>
+  <p id="status">点击方块开始</p>
+  <div id="box"></div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const tg = window.Telegram.WebApp;
+    const box = document.getElementById("box");
+    const status = document.getElementById("status");
+
+    let waiting = false;
+    let startTime = 0;
+
+    box.addEventListener("click", () => {
+      if (!waiting) {
+        status.textContent = "请等待颜色变绿...";
+        box.style.background = "red";
+        waiting = true;
+
+        const delay = 1000 + Math.random() * 4000; // 1~5秒随机
+        setTimeout(() => {
+          startTime = Date.now();
+          box.style.background = "green";
+          status.textContent = "快点点我！";
+        }, delay);
+      } else {
+        if (box.style.background === "green") {
+          const reactionTime = Date.now() - startTime;
+          status.textContent = `你的反应时间：${reactionTime} 毫秒`;
+          box.style.background = "gray";
+          waiting = false;
+
+          // 发送分数回机器人
+          tg.sendData(reactionTime.toString());
+        } else {
+          status.textContent = "太早了！重新来。";
+          box.style.background = "gray";
+          waiting = false;
+        }
+      }
+    });
+
+    tg.expand(); // 全屏
+  </script>
+</body>
+</html>
